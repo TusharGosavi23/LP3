@@ -1,0 +1,31 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+data = pd.read_csv('/content/sales_data_sample.csv', encoding='latin-1')
+data.head()
+numeric_data = data[['SALES', 'QUANTITYORDERED', 'PRICEEACH']]
+numeric_data = numeric_data.dropna()
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(numeric_data)
+
+wss = []  # Within-cluster sum of squares
+k_range = range(1, 11)
+for k in k_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(scaled_data)
+    wss.append(kmeans.inertia_)
+plt.figure(figsize=(10, 6))
+plt.plot(k_range, wss, marker='o')
+plt.xlabel("Number of Clusters")
+plt.ylabel("Within-cluster Sum of Squares (WSS)")
+plt.title("Elbow Method for Optimal K")
+plt.show()
+optimal_k = 3  # Example: change based on elbow graph result
+kmeans = KMeans(n_clusters=optimal_k, random_state=42)
+clusters = kmeans.fit_predict(scaled_data)
+data['Cluster'] = clusters
+
+# View clustered data
+print(data.head())

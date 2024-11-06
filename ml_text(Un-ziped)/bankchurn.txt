@@ -1,0 +1,91 @@
+## Problem Statement (churn-modeling)
+Given a bank customer, build a neural network-based classifier that can determine whether
+they will leave or not in the next 6 months.
+Dataset Description: The case study is from an open-source dataset from Kaggle.
+The dataset contains 10,000 sample points with 14 distinct features such as
+CustomerId, CreditScore, Geography, Gender, Age, Tenure, Balance, etc.
+Link to the Kaggle project:
+https://www.kaggle.com/barelydedicated/bank-customer-churn-modeling
+Perform following steps:
+1. Read the dataset.
+2. Distinguish the feature and target set and divide the data set into training and test sets.
+3. Normalize the train and test data.
+4. Initialize and build the model. Identify the points of improvement and implement the same.
+5. Print the accuracy score and confusion matrix (5 points)
+### Reading Data
+import pandas as pd
+
+df = pd.read_csv("Churn_Modelling.csv")
+
+df
+### Analyze Dataframe
+df.info()
+df.describe()
+df.head()
+### Checking Datatypes
+df.dtypes
+df['Geography'].unique()
+### Drop Unwanted Features
+df = df.drop('Surname', axis = 1 )
+## Importing LabelEncoder from sklearm.preprocessing
+for encoding obj type to int labels. 
+Types of Encoding: 
+1) Label Encoding (for less unique classes int labels). 
+2) Onehot Encoding (for more uniques classes each class is converted into independent featues and 0/1 value is assigned to respected class).
+3) Custom Encoding (custom priority or weightage is assigned to perticular classes).
+from sklearn.preprocessing import LabelEncoder
+
+LE = LabelEncoder()
+### Encoding obj type with int labels
+
+df['Geography'] = LE.fit_transform(df['Geography'])
+df['Geography'].unique()
+df['Gender'] = LE.fit_transform(df['Gender'])
+df['Gender'].unique()
+df
+df.dtypes
+df.shape
+### Droping features not related with objective
+df = df.drop('RowNumber', axis = 1) 
+df = df.drop('CustomerId', axis = 1)
+### Finding Correlation for finding relavent features
+import seaborn as sns
+df.corr()
+# Visualizing Correlation in Heatmap
+sns.heatmap(df.corr(), annot=True)
+### Visualization
+df.plot()
+### Scaling of DataFrame
+for uniform distribustion
+# RobustScaler
+from sklearn.preprocessing import RobustScaler
+
+scalar = RobustScaler()
+x = df.drop('Exited', axis=1)
+y = df['Exited']
+x_scaled = scalar.fit_transform(x)
+x_scaled
+### Spliting data for training and testing
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x_scaled, y, test_size=0.20, random_state=42)
+### Logistic Regression Model
+from sklearn.linear_model import LogisticRegression
+LR = LogisticRegression()
+LR.fit(x_train,y_train)
+y_pred = LR.predict(x_test)
+### Evaluation of LogisticRegression Model
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy*100}%")
+### DecisionTree Classifier Model
+from sklearn.tree import DecisionTreeClassifier
+DTC = DecisionTreeClassifier()
+DTC.fit(x_train,y_train)
+y_pred = DTC.predict(x_test)
+### Evaluation of DecisionTreeClassifier Model
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy*100}%")
+### Try using KNN and SVM for better accuracy
